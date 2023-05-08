@@ -7,69 +7,49 @@ namespace LerPlanilhaExcel
     {
         static void Main(string[] args)
         {
-            var xls = new XLWorkbook(@"C:\Users\Robertson\Documents\projetos\rt_iot\dotNeParalelismProcessor\data.xlsx");
-            var planilha = xls.Worksheets.First(w => w.Name == "Sheet1");
-            var totalLinhas = planilha.Rows().Count();
-            // primeira linha é o cabecalho
-            var persons = new List<string>();
-            for (int l = 1; l <= totalLinhas; l++)
+            var xls = new XLWorkbook(@"C:\Users\Robertson\Documents\projetos\rt_iot\dotNeParalelismProcessor\sample\data100000.xlsx");
+            var file = xls.Worksheets.First(w => w.Name == "Sheet1");
+            var totalRows = file.Rows().Count();
+            var listOfPeople = new List<string>();
+            for (int l = 1; l <= totalRows; l++)
             {
-                var name = planilha.Cell($"A{l}").Value.ToString();
-                persons.Add(name);
-                //Console.WriteLine($"{name}");
+                var name = file.Cell($"A{l}").Value.ToString();
+                listOfPeople.Add(name);
             }
-            Console.WriteLine(persons.Count);
-            synchronousProcessing(persons);
-            parallelProcessing(persons);
+            Console.WriteLine("First record from sample: " + listOfPeople[0]);
+            Console.WriteLine("Las record from sample: " + listOfPeople[listOfPeople.Count() - 1]);
+            synchronousProcessing(listOfPeople);
+            parallelProcessing(listOfPeople);
         }
 
 
-        static void parallelProcessing(List<string> listOfPerons) {
+        static void parallelProcessing(List<string> listOfPeople) {
             var dataBaseCon = new DBconnection.Database();
-            var cs = "Host=localhost;Username=postgres;Password=321;Database=postgres";
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
-            using var cmdDrop = new NpgsqlCommand();
-            cmdDrop.Connection = con;
-            cmdDrop.CommandText = "DROP TABLE IF EXISTS persons";
-            cmdDrop.ExecuteNonQuery();
-            cmdDrop.CommandText = @"CREATE TABLE persons(id SERIAL PRIMARY KEY,name VARCHAR(255) NOT NULL)";
-            cmdDrop.ExecuteNonQuery();
-            Console.WriteLine("Table droped and created."); 
-            con.Close(); 
+            using var con = dataBaseCon.getConnection();
+            dataBaseCon.dropAndCreateTable();
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            Parallel.ForEach(listOfPerons, person =>
+            Parallel.ForEach(listOfPeople, person =>
             {
                 dataBaseCon.inserPersonToDB(person);
             });
             watch.Stop();
             var elapsedMs = watch.ElapsedMilliseconds;
-            Console.WriteLine("Parallel people saved. Tooked milliseconds: " + elapsedMs);
-
+            Console.WriteLine("[C#] Parallel implementation took " + elapsedMs + " milliseconds and processed " + listOfPeople.Count() + " records.");
         }
 
-        static void synchronousProcessing(List<string> listOfPerons) {
+        static void synchronousProcessing(List<string> listOfPeople) {
             var dataBaseCon = new DBconnection.Database();
-            var cs = "Host=localhost;Username=postgres;Password=321;Database=postgres";
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
-            using var cmdDrop = new NpgsqlCommand();
-            cmdDrop.Connection = con;
-            cmdDrop.CommandText = "DROP TABLE IF EXISTS persons";
-            cmdDrop.ExecuteNonQuery();
-            cmdDrop.CommandText = @"CREATE TABLE persons(id SERIAL PRIMARY KEY,name VARCHAR(255) NOT NULL)";
-            cmdDrop.ExecuteNonQuery();
-            Console.WriteLine("Table droped and created."); 
-            con.Close();
+            using var con = dataBaseCon.getConnection();
+            dataBaseCon.dropAndCreateTable();
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            foreach (string person in listOfPerons)
+            foreach (string person in listOfPeople)
             {
                 dataBaseCon.inserPersonToDB(person);
             };
             watch.Stop();
 
             var elapsedMs = watch.ElapsedMilliseconds;
-            Console.WriteLine("Synchronous people saved. Tooked milliseconds: " + elapsedMs);
+            Console.WriteLine("[C#] Synchronous implementation took " + elapsedMs + " milliseconds and processed " + listOfPeople.Count() + " records.");
         }
     }
 }

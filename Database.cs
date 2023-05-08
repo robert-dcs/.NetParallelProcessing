@@ -6,34 +6,27 @@ namespace DBconnection
     {
         public NpgsqlConnection getConnection()
         {
-            
             var cs = "Host=localhost;Username=postgres;Password=321;Database=postgres";
-            using var con = new NpgsqlConnection(cs);
-            return con;
-            
+            return new NpgsqlConnection(cs);
         }
 
-        public void printDbVersion()
+        public void dropAndCreateTable()
         {
-            
-
-            var cs = "Host=localhost;Username=postgres;Password=321;Database=postgres";
-
-            using var con = new NpgsqlConnection(cs);
+            using var con = getConnection();
             con.Open();
-
-            var sql = "SELECT version()";
-
-            using var cmd = new NpgsqlCommand(sql, con);
-
-            var version = cmd.ExecuteScalar().ToString();
-            Console.WriteLine($"PostgreSQL version: {version}");
-            
+            using var cmdDrop = new NpgsqlCommand();
+            cmdDrop.Connection = con;
+            cmdDrop.CommandText = "DROP TABLE IF EXISTS persons";
+            cmdDrop.ExecuteNonQuery();
+            cmdDrop.CommandText = @"CREATE TABLE persons(id SERIAL PRIMARY KEY,name VARCHAR(255) NOT NULL)";
+            cmdDrop.ExecuteNonQuery();
+            Console.WriteLine("Table droped and created."); 
+            con.Close(); 
         }
+
         public void inserPersonToDB(string person)
         {
-            var cs = "Host=localhost;Username=postgres;Password=321;Database=postgres";
-            using var con = new NpgsqlConnection(cs);
+            using var con = getConnection();
             con.Open();
             var sql = "INSERT INTO persons(name) VALUES(@name)";
             using var cmd = new NpgsqlCommand(sql, con);
