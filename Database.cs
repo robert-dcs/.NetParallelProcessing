@@ -16,9 +16,9 @@ namespace DBconnection
             con.Open();
             using var cmdDrop = new NpgsqlCommand();
             cmdDrop.Connection = con;
-            cmdDrop.CommandText = "DROP TABLE IF EXISTS persons";
+            cmdDrop.CommandText = "DROP TABLE IF EXISTS person";
             cmdDrop.ExecuteNonQuery();
-            cmdDrop.CommandText = @"CREATE TABLE persons(id SERIAL PRIMARY KEY,name VARCHAR(255) NOT NULL)";
+            cmdDrop.CommandText = @"CREATE TABLE person(id SERIAL PRIMARY KEY,name VARCHAR(255) NOT NULL)";
             cmdDrop.ExecuteNonQuery();
             Console.WriteLine("Table droped and created."); 
             con.Close(); 
@@ -28,7 +28,7 @@ namespace DBconnection
         {
             using var con = getConnection();
             con.Open();
-            var sql = "INSERT INTO persons(name) VALUES(@name)";
+            var sql = "INSERT INTO person(name) VALUES(@name)";
             using var cmd = new NpgsqlCommand(sql, con);
             cmd.Parameters.AddWithValue("name", person);
             cmd.Prepare();

@@ -7,7 +7,7 @@ namespace LerPlanilhaExcel
     {
         static void Main(string[] args)
         {
-            var xls = new XLWorkbook(@"C:\Users\Robertson\Documents\projetos\rt_iot\dotNeParalelismProcessor\sample\data100000.xlsx");
+            var xls = new XLWorkbook(@"C:\Users\Robertson\Documents\projetos\rt_iot\dotNeParalelismProcessor\sample\data1000.xlsx");
             var file = xls.Worksheets.First(w => w.Name == "Sheet1");
             var totalRows = file.Rows().Count();
             var listOfPeople = new List<string>();
