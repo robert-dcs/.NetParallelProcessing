@@ -34,7 +34,8 @@ namespace LerPlanilhaExcel
             });
             watch.Stop();
             var elapsedMs = watch.ElapsedMilliseconds;
-            Console.WriteLine("[C#] Parallel implementation took " + elapsedMs + " milliseconds and processed " + listOfPeople.Count() + " records.");
+            Console.WriteLine("[C#] Parallel implementation took " + elapsedMs + " milliseconds.");
+            Console.WriteLine("[C#] Processed " + listOfPeople.Count() + " records.");
         }
 
         static void synchronousProcessing(List<string> listOfPeople) {
@@ -49,7 +50,8 @@ namespace LerPlanilhaExcel
             watch.Stop();
 
             var elapsedMs = watch.ElapsedMilliseconds;
-            Console.WriteLine("[C#] Synchronous implementation took " + elapsedMs + " milliseconds and processed " + listOfPeople.Count() + " records.");
+            Console.WriteLine("[C#] Synchronous implementation took " + elapsedMs + " milliseconds.");
+            Console.WriteLine("[C#] Processed " + listOfPeople.Count() + " records.");
         }
     }
 }
