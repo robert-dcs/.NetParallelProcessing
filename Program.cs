@@ -8,7 +8,7 @@ namespace LerPlanilhaExcel
         static void Main(string[] args)
         {
 
-            for (int sampleSize = 1000000; sampleSize <= 1000000; sampleSize *= 10) {
+            for (int sampleSize = 1000; sampleSize <= 1000000; sampleSize *= 10) {
                 Console.WriteLine("\n*--------- New execution: sample size " + sampleSize + " ----------*");
 
                 var xls = new XLWorkbook(@"C:\Users\Robertson\Documents\projetos\rt_iot\dotNeParalelismProcessor\sample\data" + sampleSize + ".xlsx"); 
@@ -24,10 +24,10 @@ namespace LerPlanilhaExcel
                 Console.WriteLine("Las record from sample: " + listOfPeople[listOfPeople.Count() - 1]);
                 for (int u = 0; u < 3; u++) {
                     Console.WriteLine("\n*---------" + u + " executin ----------*");
-                    //SynchronousProcessing(listOfPeople);
-                    //ParallelProcessing(listOfPeople);
+                    SynchronousProcessing(listOfPeople);
+                    ParallelProcessing(listOfPeople);
                     ParallelProcessing2(listOfPeople);
-                    //ParallelProcessing3(listOfPeople);
+                    ParallelProcessing3(listOfPeople);
                 }
             }
         }
