@@ -7,27 +7,35 @@ namespace LerPlanilhaExcel
     {
         static void Main(string[] args)
         {
-            int sampleSize = 1000000;
-            var xls = new XLWorkbook(@"C:\Users\Robertson\Documents\projetos\rt_iot\dotNeParalelismProcessor\sample\data"+sampleSize+".xlsx"); 
-            var file = xls.Worksheets.First(w => w.Name == "Sheet1");
-            var totalRows = file.Rows().Count();
-            var listOfPeople = new List<string>();
-            for (int l = 1; l <= totalRows; l++)
-            {
-                var name = file.Cell($"A{l}").Value.ToString();
-                listOfPeople.Add(name);
+
+            for (int sampleSize = 1000000; sampleSize <= 1000000; sampleSize *= 10) {
+                Console.WriteLine("\n*--------- New execution: sample size " + sampleSize + " ----------*");
+
+                var xls = new XLWorkbook(@"C:\Users\Robertson\Documents\projetos\rt_iot\dotNeParalelismProcessor\sample\data" + sampleSize + ".xlsx"); 
+                var file = xls.Worksheets.First(w => w.Name == "Sheet1");
+                var totalRows = file.Rows().Count();
+                var listOfPeople = new List<string>();
+                for (int l = 1; l <= totalRows; l++)
+                {
+                    var name = file.Cell($"A{l}").Value.ToString();
+                    listOfPeople.Add(name);
+                }
+                Console.WriteLine("First record from sample: " + listOfPeople[0]);
+                Console.WriteLine("Las record from sample: " + listOfPeople[listOfPeople.Count() - 1]);
+                for (int u = 0; u < 3; u++) {
+                    Console.WriteLine("\n*---------" + u + " executin ----------*");
+                    //SynchronousProcessing(listOfPeople);
+                    //ParallelProcessing(listOfPeople);
+                    ParallelProcessing2(listOfPeople);
+                    //ParallelProcessing3(listOfPeople);
+                }
             }
-            Console.WriteLine("First record from sample: " + listOfPeople[0]);
-            Console.WriteLine("Las record from sample: " + listOfPeople[listOfPeople.Count() - 1]);
-               
-            SynchronousProcessing(listOfPeople);
-            ParallelProcessing(listOfPeople);
-            ParallelProcessing2(listOfPeople);
-            ParallelProcessing3(listOfPeople);
         }
 
         static void ParallelProcessing(List<string> listOfPeople) 
         {
+            Console.WriteLine("\n*--------- Parallel 1 ----------*");
+
             var dataBaseCon = new DBconnection.Database();
             using var con = dataBaseCon.getConnection();
             dataBaseCon.dropAndCreateTable();
@@ -40,10 +48,15 @@ namespace LerPlanilhaExcel
             var elapsedMs = watch.ElapsedMilliseconds;
             Console.WriteLine("[C#] Parallel implementation 1 took " + elapsedMs + " milliseconds.");
             Console.WriteLine("[C#] Processed " + listOfPeople.Count() + " records.");
+            dataBaseCon.countRows();
+            dataBaseCon.getFirstRecord();
+            dataBaseCon.getLastRecord();
         }
 
         static void ParallelProcessing2(List<string> listOfPeople) 
         {
+            Console.WriteLine("\n*--------- Parallel 2 ----------*");
+
             var dataBaseCon = new DBconnection.Database();
             using var con = dataBaseCon.getConnection();
             dataBaseCon.dropAndCreateTable();
@@ -53,10 +66,15 @@ namespace LerPlanilhaExcel
             var elapsedMs = watch.ElapsedMilliseconds;
             Console.WriteLine("[C#] Parallel implementation 2 took " + elapsedMs + " milliseconds.");
             Console.WriteLine("[C#] Processed " + listOfPeople.Count() + " records.");
+            dataBaseCon.countRows();
+            dataBaseCon.getFirstRecord();
+            dataBaseCon.getLastRecord();
         }
 
         static void ParallelProcessing3(List<string> listOfPeople) 
         {
+            Console.WriteLine("\n*--------- Parallel 3 ----------*");
+
             var dataBaseCon = new DBconnection.Database();
             List<Thread> threads = new List<Thread>();
             using var con = dataBaseCon.getConnection();
@@ -95,10 +113,15 @@ namespace LerPlanilhaExcel
             var elapsedMs = watch.ElapsedMilliseconds;
             Console.WriteLine("[C#] Parallel implementation 3 took " + elapsedMs + " milliseconds.");
             Console.WriteLine("[C#] Processed " + listOfPeople.Count() + " records.");
+            dataBaseCon.countRows();
+            dataBaseCon.getFirstRecord();
+            dataBaseCon.getLastRecord();
         }
         
         static void SynchronousProcessing(List<string> listOfPeople) 
         {
+            Console.WriteLine("\n*--------- Synchronous ----------*");
+
             var dataBaseCon = new DBconnection.Database();
             using var con = dataBaseCon.getConnection();
             dataBaseCon.dropAndCreateTable();
@@ -112,6 +135,9 @@ namespace LerPlanilhaExcel
             var elapsedMs = watch.ElapsedMilliseconds;
             Console.WriteLine("[C#] Synchronous implementation took " + elapsedMs + " milliseconds.");
             Console.WriteLine("[C#] Processed " + listOfPeople.Count() + " records.");
+            dataBaseCon.countRows();
+            dataBaseCon.getFirstRecord();
+            dataBaseCon.getLastRecord();
         }
     }
 }

@@ -20,7 +20,7 @@ namespace DBconnection
             cmdDrop.ExecuteNonQuery();
             cmdDrop.CommandText = @"CREATE TABLE person(id SERIAL PRIMARY KEY,name VARCHAR(255) NOT NULL)";
             cmdDrop.ExecuteNonQuery();
-            Console.WriteLine("Table droped and created."); 
+            Console.WriteLine("DB initialized"); 
             con.Close(); 
         }
 
@@ -34,6 +34,59 @@ namespace DBconnection
             cmd.Prepare();
             cmd.ExecuteNonQuery();
             con.Close();
+        }
+
+        
+        public void countRows()
+        {
+            using var con = getConnection();
+            con.Open();
+            var sql = "SELECT count(*) FROM person";
+            using var cmd = new NpgsqlCommand(sql, con);
+            Int64 count = (Int64) cmd.ExecuteScalar();
+
+            Console.WriteLine("DB rows: " + count);
+ 
+            con.Close();
+        }
+
+        
+        public void getFirstRecord()
+        {
+            using var con = getConnection();
+            con.Open();
+            var sql = "SELECT name FROM person ORDER BY id ASC LIMIT 1";
+
+            using (NpgsqlCommand command = new NpgsqlCommand(sql, con))
+            {
+                string name;
+                NpgsqlDataReader reader = command.ExecuteReader();
+                while(reader.Read()){
+                    name = reader[0].ToString();
+                    Console.WriteLine("First row: " + name); 
+                }
+
+                con.Close();
+            }
+        }
+
+        
+        public void getLastRecord()
+        {
+            using var con = getConnection();
+            con.Open();
+            var sql = "SELECT name FROM person ORDER BY id DESC LIMIT 1";
+
+            using (NpgsqlCommand command = new NpgsqlCommand(sql, con))
+            {
+                string name;
+                NpgsqlDataReader reader = command.ExecuteReader();
+                while(reader.Read()){
+                    name = reader[0].ToString();
+                    Console.WriteLine("Last row: " + name); 
+                }
+                con.Close();
+            }
         }
     }
 }
